@@ -86,3 +86,17 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.orchestrator.rule=PathPrefix(`/api/content`) || PathPrefix(`/api/phones`)"
       - "traefik.http.services.orchestrator.loadbalancer.server.port=8001"
+
+  worker-phone-001:
+    build: ./workers
+    environment:
+      PHONE_SERIAL: ${PHONE_001_SERIAL:-phone_001}
+      REDIS_URL: ${REDIS_URL}
+      ORCHESTRATOR_URL: http://orchestrator:8001
+    networks:
+      - internal
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+    depends_on:
+      - redis
+      - orchestrator
