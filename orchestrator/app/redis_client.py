@@ -21,7 +21,7 @@ class RedisQueue:
         if result is None:
             return None
         _, data = result
-        return json.loads(data)
+        return json.loads(data if isinstance(data, str) else data.decode("utf-8"))
 
     async def length(self, phone_serial: str) -> int:
         return await self.redis.llen(self._queue_key(phone_serial))
