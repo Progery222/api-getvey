@@ -1,0 +1,36 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "docker": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm",
+        "-v", "/var/run/docker.sock:/var/run/docker.sock",
+        "mcp/docker"
+      ]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest"]
+    },
+    "shadcn": {
+      "url": "https://www.shadcn.io/api/mcp"
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-cc8242db13ce4d5c9229f3392ed76e00"
+      }
+    },
+    "magic": {
+      "command": "npx",
+      "args": ["@21st-dev/magic-mcp@latest"],
+      "env": {
+        "API_KEY": "an_sk_d95626ec5804a5e50cc84ea638dc65eb94b2e9613d751c01a312d2ea32b45975"
+      }
+    }
+  }
+}
