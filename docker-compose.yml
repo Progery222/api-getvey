@@ -133,3 +133,21 @@ services:
       - "traefik.http.middlewares.contentzavod-strip.stripprefix.prefixes=/api/contentzavod"
       - "traefik.http.routers.contentzavod.middlewares=contentzavod-strip"
       - "traefik.http.services.contentzavod.loadbalancer.server.port=8002"
+
+  dashboard-api:
+    build: ./dashboard-api
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      ORCHESTRATOR_URL: http://orchestrator:8001
+    networks:
+      - internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=PathPrefix(`/api/dashboard`)"
+      - "traefik.http.middlewares.dashboard-strip.stripprefix.prefixes=/api/dashboard"
+      - "traefik.http.routers.dashboard.middlewares=dashboard-strip"
+      - "traefik.http.services.dashboard.loadbalancer.server.port=3001"
