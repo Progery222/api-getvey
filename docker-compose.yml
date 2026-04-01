@@ -117,3 +117,19 @@ services:
       - "traefik.http.middlewares.sportzavod-strip.stripprefix.prefixes=/api/sportzavod"
       - "traefik.http.routers.sportzavod.middlewares=sportzavod-strip"
       - "traefik.http.services.sportzavod.loadbalancer.server.port=8000"
+
+  contentzavod:
+    build: ./contentzavod
+    environment:
+      REPLICATE_API_TOKEN: ${REPLICATE_API_TOKEN}
+      ORCHESTRATOR_URL: http://orchestrator:8001
+    networks:
+      - internal
+    depends_on:
+      - orchestrator
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.contentzavod.rule=PathPrefix(`/api/contentzavod`)"
+      - "traefik.http.middlewares.contentzavod-strip.stripprefix.prefixes=/api/contentzavod"
+      - "traefik.http.routers.contentzavod.middlewares=contentzavod-strip"
+      - "traefik.http.services.contentzavod.loadbalancer.server.port=8002"
