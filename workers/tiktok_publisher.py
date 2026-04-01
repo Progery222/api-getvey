@@ -25,7 +25,7 @@ class TikTokPublisher:
             return f.name
 
     async def publish(self, file_url: str, caption: str, hashtags: list[str]) -> bool:
-        local_path = self._download_video(file_url)
+        local_path = await asyncio.to_thread(self._download_video, file_url)
         self.adb.push_file(local_path, "/sdcard/Movies/upload.mp4")
         os.unlink(local_path)
 
