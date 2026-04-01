@@ -15,14 +15,19 @@ router = APIRouter(prefix="/api/content")
 scheduler = SmartScheduler()
 
 
-async def get_redis() -> Redis:
-    return Redis.from_url(os.environ["REDIS_URL"], decode_responses=True)
+async def get_redis():
+    redis = Redis.from_url(os.environ["REDIS_URL"], decode_responses=True)
+    try:
+        yield redis
+    finally:
+        await redis.aclose()
 
 
 @router.post("/queue", response_model=QueueResponse)
 async def queue_content(
     body: QueueRequest,
     db: AsyncSession = Depends(get_db),
+    redis: Redis = Depends(get_redis),
 ):
     result = await db.execute(select(Phone).where(Phone.account_id == body.account_id))
     phone = result.scalar_one_or_none()
@@ -58,7 +63,6 @@ async def queue_content(
     await db.commit()
     await db.refresh(task)
 
-    redis = await get_redis()
     queue = RedisQueue(redis)
     await queue.push(phone.serial, {
         "task_id": str(task.id),
