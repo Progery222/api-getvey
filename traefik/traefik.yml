@@ -1,15 +1,14 @@
 api:
-  dashboard: true
-  insecure: true
+  dashboard: false
 
 entryPoints:
   web:
     address: ":80"
 
 providers:
-  docker:
-    exposedByDefault: false
-    network: internal
+  file:
+    filename: /etc/traefik/routes.yml
+    watch: false
 
 log:
   level: INFO
