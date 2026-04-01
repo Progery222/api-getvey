@@ -38,6 +38,20 @@ services:
       timeout: 3s
       retries: 5
 
+  traefik:
+    image: traefik:v3.0
+    ports:
+      - "8080:80"
+      - "8081:8080"
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - internal
+    depends_on:
+      - postgres
+      - redis
+
   minio:
     image: minio/minio:RELEASE.2024-11-07T00-52-20Z
     command: server /data --console-address ":9001"
