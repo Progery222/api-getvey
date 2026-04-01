@@ -17,11 +17,14 @@ ORCHESTRATOR_URL = os.environ.get("ORCHESTRATOR_URL", "http://orchestrator:8001"
 
 async def report_status(task_id: str, status: str) -> None:
     import httpx
-    async with httpx.AsyncClient() as client:
-        await client.patch(
-            f"{ORCHESTRATOR_URL}/api/content/tasks/{task_id}/status",
-            json={"status": status},
-        )
+    try:
+        async with httpx.AsyncClient() as client:
+            await client.patch(
+                f"{ORCHESTRATOR_URL}/api/content/tasks/{task_id}/status",
+                json={"status": status},
+            )
+    except Exception as e:
+        log.warning(f"Failed to report status for task {task_id}: {e}")
 
 
 async def run_worker():
@@ -50,7 +53,7 @@ async def run_worker():
 
         log.info(f"Task {task_id}: publishing...")
         try:
-            publisher.publish(
+            await publisher.publish(
                 file_url=task["file_url"],
                 caption=task.get("caption", ""),
                 hashtags=task.get("hashtags", []),

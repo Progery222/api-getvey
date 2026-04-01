@@ -1,4 +1,5 @@
-import time
+import asyncio
+import os
 import tempfile
 import httpx
 from adb_controller import ADBController
@@ -23,29 +24,30 @@ class TikTokPublisher:
                     f.write(chunk)
             return f.name
 
-    def publish(self, file_url: str, caption: str, hashtags: list[str]) -> bool:
+    async def publish(self, file_url: str, caption: str, hashtags: list[str]) -> bool:
         local_path = self._download_video(file_url)
         self.adb.push_file(local_path, "/sdcard/Movies/upload.mp4")
+        os.unlink(local_path)
 
         self.adb._run("shell", "am", "start", "-n", "com.zhiliaoapp.musically/.main.MainActivity")
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         self.adb.tap(*self.UPLOAD_BUTTON)
-        time.sleep(2)
+        await asyncio.sleep(2)
 
         self.adb.tap(*self.SELECT_VIDEO)
-        time.sleep(1)
+        await asyncio.sleep(1)
         self.adb.tap(*self.NEXT_BUTTON)
-        time.sleep(2)
+        await asyncio.sleep(2)
         self.adb.tap(*self.NEXT_BUTTON)
-        time.sleep(2)
+        await asyncio.sleep(2)
 
         full_caption = caption + " " + " ".join(f"#{h}" for h in hashtags)
         self.adb.tap(*self.CAPTION_FIELD)
         self.adb._run("shell", "input", "text", full_caption.replace(" ", "%s"))
-        time.sleep(1)
+        await asyncio.sleep(1)
 
         self.adb.tap(*self.POST_BUTTON)
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         return True
