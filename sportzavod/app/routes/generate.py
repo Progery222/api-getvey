@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from uuid import UUID
 import httpx
@@ -23,7 +23,7 @@ async def generate_and_queue(body: GenerateRequest) -> dict:
     script = await generate_script(body.sport, body.team, body.event)
     video_url = await create_video(script)
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=30) as client:
         resp = await client.post(
             f"{ORCHESTRATOR_URL}/api/content/queue",
             json={
@@ -42,4 +42,11 @@ async def generate_and_queue(body: GenerateRequest) -> dict:
 
 @router.post("/generate")
 async def generate(body: GenerateRequest):
-    return await generate_and_queue(body)
+    try:
+        return await generate_and_queue(body)
+    except TimeoutError:
+        raise HTTPException(status_code=504, detail="Video generation timed out")
+    except RuntimeError as e:
+        raise HTTPException(status_code=502, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Internal error")

@@ -30,7 +30,7 @@ async def create_video(script: str, avatar_id: str = "default") -> str:
                 f"{HEYGEN_BASE}/video/{video_id}",
                 headers={"X-Api-Key": HEYGEN_API_KEY},
             )
-        data = status_resp.json()["data"]
+            data = status_resp.json()["data"]
         if data["status"] == "completed":
             return data["video_url"]
         if data["status"] == "failed":
