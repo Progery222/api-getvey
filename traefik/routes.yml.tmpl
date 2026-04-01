@@ -1,9 +1,9 @@
 http:
   routers:
-    orchestrator:
+    opt:
       entryPoints: [web]
       rule: "PathPrefix(`/api/content`) || PathPrefix(`/api/phones`)"
-      service: orchestrator
+      service: opt
 
     sportzavod:
       entryPoints: [web]
@@ -35,22 +35,22 @@ http:
         prefixes: ["/api/dashboard"]
 
   services:
-    orchestrator:
+    opt:
       loadBalancer:
         servers:
-          - url: "http://orchestrator.railway.internal:8001"
+          - url: "${OPT_URL}"
 
     sportzavod:
       loadBalancer:
         servers:
-          - url: "http://sportzavod.railway.internal:8000"
+          - url: "http://sportzavod.railway.internal:${SPORTZAVOD_PORT}"
 
     contentzavod:
       loadBalancer:
         servers:
-          - url: "http://contentzavod.railway.internal:8002"
+          - url: "http://contentzavod.railway.internal:${CONTENTZAVOD_PORT}"
 
     dashboard-api:
       loadBalancer:
         servers:
-          - url: "http://dashboard-api.railway.internal:3001"
+          - url: "http://dashboard-api.railway.internal:${DASHBOARD_API_PORT}"
