@@ -1,8 +1,12 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from uuid import UUID
 import httpx
 import os
+
+log = logging.getLogger(__name__)
 
 from ..replicate_client import generate_video
 
@@ -40,4 +44,5 @@ async def generate(body: GenerateRequest):
     except RuntimeError as e:
         raise HTTPException(status_code=502, detail=str(e))
     except Exception as e:
+        log.error(f"generate failed: {e}")
         raise HTTPException(status_code=500, detail="Internal error")
