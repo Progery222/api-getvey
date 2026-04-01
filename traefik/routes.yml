@@ -1,0 +1,56 @@
+http:
+  routers:
+    orchestrator:
+      entryPoints: [web]
+      rule: "PathPrefix(`/api/content`) || PathPrefix(`/api/phones`)"
+      service: orchestrator
+
+    sportzavod:
+      entryPoints: [web]
+      rule: "PathPrefix(`/api/sportzavod`)"
+      service: sportzavod
+      middlewares: [sportzavod-strip]
+
+    contentzavod:
+      entryPoints: [web]
+      rule: "PathPrefix(`/api/contentzavod`)"
+      service: contentzavod
+      middlewares: [contentzavod-strip]
+
+    dashboard:
+      entryPoints: [web]
+      rule: "PathPrefix(`/api/dashboard`)"
+      service: dashboard-api
+      middlewares: [dashboard-strip]
+
+  middlewares:
+    sportzavod-strip:
+      stripPrefix:
+        prefixes: ["/api/sportzavod"]
+    contentzavod-strip:
+      stripPrefix:
+        prefixes: ["/api/contentzavod"]
+    dashboard-strip:
+      stripPrefix:
+        prefixes: ["/api/dashboard"]
+
+  services:
+    orchestrator:
+      loadBalancer:
+        servers:
+          - url: "http://orchestrator.railway.internal:8001"
+
+    sportzavod:
+      loadBalancer:
+        servers:
+          - url: "http://sportzavod.railway.internal:8000"
+
+    contentzavod:
+      loadBalancer:
+        servers:
+          - url: "http://contentzavod.railway.internal:8002"
+
+    dashboard-api:
+      loadBalancer:
+        servers:
+          - url: "http://dashboard-api.railway.internal:3001"
